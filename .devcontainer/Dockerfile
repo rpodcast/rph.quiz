@@ -28,12 +28,15 @@ RUN apt-get update && export DEBIAN_FRONTEND=noninteractive \
 # key dependencies for certain R packages
 RUN apt-get update \
     && export DEBIAN_FRONTEND=noninteractive \
-    && apt-get -y install --no-install-recommends software-properties-common libssl-dev libxml2-dev libcurl4-openssl-dev python3-pip pandoc \
-    && apt-get -y install --no-install-recommends libfreetype6-dev libfontconfig1-dev tk \
+    && apt-get -y install --no-install-recommends software-properties-common libssl-dev libxml2-dev libcurl4-openssl-dev python3-pip pandoc libfreetype6-dev libfontconfig1-dev tk libzmq3-dev build-essential g++ libclang-dev autotools-dev autoconf automake \
     && apt-get autoremove -y && apt-get clean -y && rm -rf /var/lib/apt/lists/*
 
 # install R packages needed for VSCode interaction and package management
 RUN install2.r languageserver renv remotes httpgd
+RUN installGithub.r ropensci-review-tools/pkgstats
+
+RUN R --no-save -e "pkgstats::ctags_install()"
+
 
 # install radian via python and pip3
 RUN apt-get update \
