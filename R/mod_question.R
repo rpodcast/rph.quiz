@@ -7,14 +7,14 @@
 #' @noRd 
 #'
 #' @importFrom shiny NS tagList 
-mod_question_ui <- function(id){
+mod_question_ui <- function(id, question_index = 1){
   ns <- NS(id)
   tagList(
     fluidRow(
       col_12(
         radioButtons(
           inputId = ns("qinput"),
-          label = "My Question",
+          label = glue::glue("Question {question_index}"),
           choices = c("a", "b", "c", "d"),
         ),
         # shinyWidgets::prettyRadioButtons(
@@ -26,12 +26,23 @@ mod_question_ui <- function(id){
         #   status = "info",
         #   animation = "jelly"
         # ),
-        shinyWidgets::actionBttn(
-          inputId = ns("qsubmit"),
-          label = "Submit",
-          icon = icon("check"),
-          color = "success",
-          style = "jelly"
+        fluidRow(
+          shinyWidgets::actionBttn(
+            inputId = ns("qsubmit"),
+            label = "Submit",
+            icon = icon("check"),
+            color = "success",
+            size = "sm",
+            style = "jelly"
+          ),
+          shinyWidgets::actionBttn(
+            inputId = ns("qreset"),
+            label = "Reset",
+            icon = icon("eraser"),
+            color = "danger",
+            size = "sm",
+            style = "jelly"
+          )
         )
       )
     )

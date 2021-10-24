@@ -5,13 +5,41 @@
 #' @import shiny
 #' @noRd
 app_ui <- function(request) {
+  n_questions <- 1:2
   tagList(
     # Leave this function for adding external resources
     golem_add_external_resources(),
     # Your application UI logic 
     fluidPage(
       h1("rph.quiz"),
-      mod_question_ui("question_ui_1")
+      fluidRow(
+        col_12(
+          tabsetPanel(
+            id = "tabs",
+            type = "hidden",
+            tabPanel(
+              "Hello",
+              "This is the hello tab",
+              value = "hello"
+            )
+          )
+        )
+      ),
+      fluidRow(
+        col_2(
+          actionButton(
+            inputId = "prev_button",
+            "Back"
+          )
+        ),
+        col_2(
+          actionButton(
+            inputId = "next_button",
+            "Next"
+          )
+        )
+      )
+      #mod_question_ui("question_ui_1")
     )
   )
 }
