@@ -16,16 +16,8 @@ mod_question_ui <- function(id, question_index = 1){
           inputId = ns("qinput"),
           label = glue::glue("Question {question_index}"),
           choices = c("a", "b", "c", "d"),
+          selected = character(0)
         ),
-        # shinyWidgets::prettyRadioButtons(
-        #   inputId = ns("qinput"),
-        #   label = "My Question",
-        #   choices = c("a", "b", "c", "d"),
-        #   icon = icon("check"),
-        #   bigger = TRUE,
-        #   status = "info",
-        #   animation = "jelly"
-        # ),
         fluidRow(
           shinyWidgets::actionBttn(
             inputId = ns("qsubmit"),
@@ -56,12 +48,23 @@ mod_question_server <- function(id){
   moduleServer( id, function(input, output, session){
     ns <- session$ns
 
+    observe({
+      shinyjs::toggleState(id = "qsubmit", condition = shiny::isTruthy(input$qinput))
+    })
+
     observeEvent(input$qsubmit, {
       message("qsubmit clicked")
       #shinyjs::delay(100, shinyjs::toggle("qinput"))
       shinyjs::disable(selector = "[type=radio][value=b]")
       shinyjs::disable(selector = "[type=radio][value=c]")
       shinyjs::disable(selector = "[type=radio][value=d]")
+    })
+
+    observeEvent(input$qreset, {
+      message("qreset clicked")
+      shinyjs::enable(selector = "[type=radio][value=b]")
+      shinyjs::enable(selector = "[type=radio][value=c]")
+      shinyjs::enable(selector = "[type=radio][value=d]")
     })
 
   })
