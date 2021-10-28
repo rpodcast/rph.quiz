@@ -7,3 +7,6 @@
 prototyping/*
 !prototyping/README.md
 .Renviron
+deploy_files/*
+!deploy_files/README.md
+.env
