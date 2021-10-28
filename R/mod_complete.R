@@ -39,9 +39,6 @@ mod_complete_server <- function(id, answers_res){
   moduleServer( id, function(input, output, session){
     ns <- session$ns
 
-    # reactive values
-    
-
     observeEvent(input$qsubmit, {
       if (!shiny::isTruthy(input$user_id)) {
         shinyWidgets::show_alert(
@@ -62,7 +59,6 @@ mod_complete_server <- function(id, answers_res){
           'name', query = '{}'
         )
 
-        # TODO: Finish checking
         if (input$user_id %in% all_ids) {
           shinyWidgets::show_alert(
             title = "Oops!",
