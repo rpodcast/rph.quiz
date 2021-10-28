@@ -22,6 +22,7 @@ usethis::use_package( "thinkr" )
 golem::add_module( name = "question" ) # Name of the module
 golem::add_module( name = "welcome" ) # Name of the module
 golem::add_module( name = "complete")
+golem::add_module( name = "prevent_timeout")
 
 ## Add helper functions ----
 ## Creates fct_* and utils_*
@@ -30,7 +31,7 @@ golem::add_utils( "mongodb" )
 
 ## External resources
 ## Creates .js and .css files at inst/app/www
-golem::add_js_file( "script" )
+golem::add_js_file( "prevent_timeout" )
 golem::add_js_handler( "handlers" )
 golem::add_css_file( "custom" )
 

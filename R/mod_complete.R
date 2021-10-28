@@ -66,7 +66,7 @@ mod_complete_server <- function(id, answers_res){
             type = "error"
           )
 
-          updateTextInput(inputId = ns("user_id"), value = "")
+          updateTextInput(inputId = "user_id", value = "")
 
           return(NULL)
         }
@@ -85,7 +85,7 @@ mod_complete_server <- function(id, answers_res){
           type = "success"
       )
 
-      updateTextInput(inputId = ns("user_id"), value = "")
+      updateTextInput(inputId = "user_id", value = "")
     })
   })
 }

@@ -8,17 +8,22 @@ app_server <- function( input, output, session ) {
 
   whereami::cat_where(whereami::whereami())
 
-  mongo_port <- get_golem_config("mongoport")
-  mongo_host <- get_golem_config("mongohost")
-  mongo_db <- get_golem_config("mongodb")
-  mongo_collection <- get_golem_config("mongocollection")
-  mongo_user <- get_golem_config("mongouser")
-  mongo_password <- get_golem_config("mongopass")
-  mongo_ca <- get_golem_config("mongoca")
-  mongo_repset <- get_golem_config("mongorepset")
+  prod_mode <- getOption("golem.app.prod")
+
+  mongo_port <- get_golem_config("mongodb_port")
+  mongo_host <- get_golem_config("mongodb_host")
+  mongo_db <- get_golem_config("mongodb_db")
+  mongo_collection <- get_golem_config("mongodb_collection")
+  mongo_user <- get_golem_config("mongodb_user")
+  mongo_password <- get_golem_config("mongodb_pass")
+  mongo_ca <- get_golem_config("mongodb_ca")
+  mongo_repset <- get_golem_config("mongodb_repset")
 
   if ( golem::get_golem_options("with_mongo") ){
+    message("I am going to connect to mongo")
     launch_mongo_shiny(
+      session = session,
+      prod = prod_mode,
       collection = mongo_collection, 
       db = mongo_db, 
       host = mongo_host, 
@@ -31,7 +36,17 @@ app_server <- function( input, output, session ) {
   }
 
   # Your application server logic 
-  #mod_question_server("question_ui_1")
+  
+    # Disable shiny server timeout
+  prevent_counter <- mod_prevent_timeout_server("prevent_timeout_ui_1")
+
+  observeEvent(prevent_counter, {
+    if (!is.null(prevent_counter())) {
+      x <- prevent_counter()
+      message(glue::glue("session prevent count is {x}"))
+    }
+  })
+
   n_questions <- 2
   question_vec <- 1:n_questions
   

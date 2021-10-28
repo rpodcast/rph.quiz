@@ -1,14 +1,17 @@
 launch_mongo <- function(
+  prod = FALSE,
   collection = "quizanswers",
   db = "rphquiz",
   host = "127.0.0.1",
   port = 27017,
-  user = "",
-  pass = "",
+  user = Sys.getenv("MONGODB_USER"),
+  pass = Sys.getenv("MONGODB_PASS"),
   ca_path = "",
-  replicaset = ""
+  replicaset = Sys.getenv("MONGODB_REPLICASET")
 ) {
-  if (user != "") {
+  if (prod) {
+    message("entered prod of launch_mongo")
+    
     url_string <- sprintf("mongodb+srv://%s:%s@%s/admin?authSource=admin&replicaSet=%s",
     user,
     pass,
@@ -42,6 +45,7 @@ launch_mongo <- function(
 #' @noRd
 launch_mongo_shiny <- function(
   session = getDefaultReactiveDomain(),
+  prod = FALSE,
   collection = "quizanswers",
   db = "rphquiz",
   host = "127.0.0.1",
@@ -51,8 +55,10 @@ launch_mongo_shiny <- function(
   ca_path = NULL,
   replicaset = NULL
 ){
-
+  message("entered launch mongo shiny")
+  
   session$userData$mongo <- launch_mongo(
+    prod = prod,
     collection = collection,
     db = db,
     host = host,

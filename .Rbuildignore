@@ -7,3 +7,10 @@ dev_history.R
 ^dev$
 $run_dev.*
 ^LICENSE\.md$
+^Dockerfile$
+^protoyping$
+^deploy_files*
+^\.env$
+^\.env\.example$
+^\.Renviron$
+^\.Renviron\.example$
