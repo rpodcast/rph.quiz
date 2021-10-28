@@ -11,7 +11,6 @@ app_ui <- function(request) {
     golem_add_external_resources(),
     # Your application UI logic 
     fluidPage(
-      h1("rph.quiz"),
       fluidRow(
         col_12(
           tabsetPanel(
@@ -19,7 +18,7 @@ app_ui <- function(request) {
             type = "hidden",
             tabPanel(
               "Hello",
-              "This is the hello tab",
+              mod_welcome_ui("welcome_ui_1"),
               value = "hello"
             )
           )

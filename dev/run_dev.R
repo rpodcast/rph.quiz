@@ -1,5 +1,6 @@
 # Set options here
 options(golem.app.prod = FALSE) # TRUE = production mode, FALSE = development mode
+Sys.setenv("GOLEM_CONFIG_ACTIVE" = "dev")
 
 # Detach all loaded packages and clean your environment
 golem::detach_all_attached()
@@ -9,4 +10,4 @@ golem::detach_all_attached()
 golem::document_and_reload()
 
 # Run the application
-run_app()
+run_app(with_mongo = TRUE)

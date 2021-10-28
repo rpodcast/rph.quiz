@@ -28,7 +28,7 @@ RUN apt-get update && export DEBIAN_FRONTEND=noninteractive \
 # key dependencies for certain R packages
 RUN apt-get update \
     && export DEBIAN_FRONTEND=noninteractive \
-    && apt-get -y install --no-install-recommends software-properties-common libssl-dev libxml2-dev libcurl4-openssl-dev python3-pip pandoc libfreetype6-dev libfontconfig1-dev tk libzmq3-dev build-essential g++ libclang-dev autotools-dev autoconf automake \
+    && apt-get -y install --no-install-recommends software-properties-common libssl-dev libxml2-dev libcurl4-openssl-dev python3-pip pandoc libfreetype6-dev libfontconfig1-dev tk libzmq3-dev build-essential g++ libclang-dev autotools-dev autoconf automake libsasl2-dev \
     && apt-get autoremove -y && apt-get clean -y && rm -rf /var/lib/apt/lists/*
 
 # install R packages needed for VSCode interaction and package management
@@ -60,9 +60,14 @@ RUN echo "RENV_PATHS_CACHE=/renv/cache" >> /usr/local/lib/R/etc/Renviron
 COPY library-scripts/.Rprofile-vscode /renv/.Rprofile-vscode
 
 # [Optional] Uncomment this section to add addtional system dependencies needed for project
-# RUN apt-get update \
-#     && export DEBIAN_FRONTEND=noninteractive \
-#     && apt-get -y install --no-install-recommends ---packages list----
+RUN apt-get update \
+    && export DEBIAN_FRONTEND=noninteractive \
+    && apt-get -y install --no-install-recommends default-jre-headless
+
+RUN wget https://github.com/rstudio/shinycannon/releases/download/v1.1.0/shinycannon_1.1.0-45731f0_amd64.deb -O /tmp/shinycannon_1.1.0-45731f0_amd64.deb \
+    && dpkg -i /tmp/shinycannon_1.1.0-45731f0_amd64.deb
+
+
 
 # [Optional] Set the default user. Omit if you want to keep the default as root.
 USER $USERNAME

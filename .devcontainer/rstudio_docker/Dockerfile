@@ -22,7 +22,7 @@ RUN /rocker_scripts/install_pandoc.sh
 # install key dependencies of certain packages that could be installed later
 RUN apt-get update \
     && export DEBIAN_FRONTEND=noninteractive \
-    && apt-get -y install --no-install-recommends libxml2-dev libsodium-dev libssl-dev imagemagick libmagick++-dev libgit2-dev libssh2-1-dev zlib1g-dev librsvg2-dev libudunits2-dev libfontconfig1-dev libfreetype6-dev 
+    && apt-get -y install --no-install-recommends libxml2-dev libsodium-dev libssl-dev imagemagick libmagick++-dev libgit2-dev libssh2-1-dev zlib1g-dev librsvg2-dev libudunits2-dev libfontconfig1-dev libfreetype6-dev libsasl2-dev
 
 # install R packages needed for VSCode interaction and package management
 RUN install2.r languageserver renv remotes
@@ -37,9 +37,13 @@ RUN pip3 install radian
 RUN echo "RENV_PATHS_CACHE=/renv/cache" >> /usr/local/lib/R/etc/Renviron
 
 # [Optional] Uncomment this section to add addtional system dependencies needed for project
-# RUN apt-get update \
-#     && export DEBIAN_FRONTEND=noninteractive \
-#     && apt-get -y install --no-install-recommends ---packages list----
+RUN apt-get update \
+    && export DEBIAN_FRONTEND=noninteractive \
+    && apt-get -y install --no-install-recommends default-jre-headless
+
+RUN wget https://github.com/rstudio/shinycannon/releases/download/v1.1.0/shinycannon_1.1.0-45731f0_amd64.deb -O /tmp/shinycannon_1.1.0-45731f0_amd64.deb \
+    && dpkg -i /tmp/shinycannon_1.1.0-45731f0_amd64.deb
+
 
 EXPOSE 8787
 

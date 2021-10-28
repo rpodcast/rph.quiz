@@ -1,9 +1,39 @@
 version: '3.4'
 
 services:
+  vscode:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        USERNAME: "eric"
+    user: eric
+    volumes:
+      - ..:/workspace:cached
+      - /opt/local/renv/cache:/renv/cache
+    cap_add:
+      - SYS_PTRACE
+    security_opt:
+      - seccomp:unconfined
+    
+    command: sleep infinity
+    network_mode: service:db
+
+  db:
+    image: mongo:3.4
+    command: mongod --port 12335
+    restart: unless-stopped
+    volumes:
+      - mongodb-data:/data/db
+    environment:
+      MONGO_INITDB_DATABASE: testdb
+    ports:
+      - 12335:27017
+
   rstudiopreview:
     build:
       context: ./rstudio_docker
+      dockerfile: Dockerfile
     container_name: ${CONTAINER_NAME}
     volumes:
       - ${VOLUME_PATH}:${VOLUME_PATH}
@@ -15,4 +45,7 @@ services:
     ports:
       - ${LOCAL_PORT}:8787
     env_file: .env
+
+volumes:
+  mongodb-data:
 

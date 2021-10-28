@@ -4,5 +4,19 @@ default:
   app_prod: no
 production:
   app_prod: yes
+  mongohost: !expr Sys.getenv("MONGODB_HOST")
+  mongoport: !expr Sys.getenv("MONGODB_PORT")
+  mongouser: !expr Sys.getenv("MONGODB_USER", "")
+  mongopass: !expr Sys.getenv("MONGODB_PASS", "")
+  mongodb: rphq
+  mongocollection: answers
+  mongoca: ca-certificate.crt
+  mongorepset: !expr Sys.getenv("MONGODB_REPLICASET", "")
 dev:
   golem_wd: !expr here::here()
+  mongohost: 127.0.0.1
+  mongoport: 12335
+  mongodb: rphqdev
+  mongocollection: answers
+  mongouser: ""
+  mongopass: ""

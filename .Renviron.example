@@ -1,0 +1,4 @@
+MONGODB_USER="myuser"
+MONGODB_PASS="mypassword"
+MONGODB_HOST="myhost"
+MONGODB_PORT="12345"

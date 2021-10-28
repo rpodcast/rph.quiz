@@ -184,6 +184,13 @@
       "Repository": "RSPM",
       "Hash": "e96dd3b237b2f38a2955f4bf41e047a1"
     },
+    "dplyr": {
+      "Package": "dplyr",
+      "Version": "1.0.7",
+      "Source": "Repository",
+      "Repository": "RSPM",
+      "Hash": "36f1ae62f026c8ba9f9b5c9a08c03297"
+    },
     "ellipsis": {
       "Package": "ellipsis",
       "Version": "0.3.2",
@@ -225,6 +232,13 @@
       "Source": "Repository",
       "Repository": "RSPM",
       "Hash": "44594a07a42e5f91fac9f93fda6d0109"
+    },
+    "generics": {
+      "Package": "generics",
+      "Version": "0.1.0",
+      "Source": "Repository",
+      "Repository": "RSPM",
+      "Hash": "4d243a9c10b00589889fe32314ffd902"
     },
     "gert": {
       "Package": "gert",
@@ -365,6 +379,13 @@
       "Source": "Repository",
       "Repository": "RSPM",
       "Hash": "18e9c28c1d3ca1560ce30658b22ce104"
+    },
+    "mongolite": {
+      "Package": "mongolite",
+      "Version": "2.3.1",
+      "Source": "Repository",
+      "Repository": "RSPM",
+      "Hash": "cd34a2a48e551dfa59034d1ea896de37"
     },
     "openssl": {
       "Package": "openssl",
@@ -618,6 +639,13 @@
       "Repository": "RSPM",
       "Hash": "36eb05ad4cfdfeaa56f5a9b2a1311efd"
     },
+    "tidyselect": {
+      "Package": "tidyselect",
+      "Version": "1.1.1",
+      "Source": "Repository",
+      "Repository": "RSPM",
+      "Hash": "7243004a708d06d4716717fa1ff5b2fe"
+    },
     "usethis": {
       "Package": "usethis",
       "Version": "2.1.0",
@@ -652,6 +680,13 @@
       "Source": "Repository",
       "Repository": "RSPM",
       "Hash": "ad8cfff5694ac5b3c354f8f2044bd976"
+    },
+    "whereami": {
+      "Package": "whereami",
+      "Version": "0.1.9",
+      "Source": "Repository",
+      "Repository": "RSPM",
+      "Hash": "c06f41941f905d192241f1d4ed17d58b"
     },
     "whisker": {
       "Package": "whisker",
