@@ -10,3 +10,4 @@ prototyping/*
 deploy_files/*
 !deploy_files/README.md
 .env
+firebase.rds

@@ -23,10 +23,12 @@ golem::add_module( name = "question" ) # Name of the module
 golem::add_module( name = "welcome" ) # Name of the module
 golem::add_module( name = "complete")
 golem::add_module( name = "prevent_timeout")
+golem::add_module( name = "authentication")
 
 ## Add helper functions ----
 ## Creates fct_* and utils_*
 golem::add_fct( "helpers" ) 
+golem::add_fct( "helpers", module = "authentication")
 golem::add_utils( "mongodb" )
 
 ## External resources

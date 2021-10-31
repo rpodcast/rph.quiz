@@ -35,6 +35,43 @@ launch_mongo <- function(
   }
 }
 
+launch_gridfs <- function(
+  prod = FALSE,
+  prefix = "fs",
+  db = "rphquiz",
+  host = "127.0.0.1",
+  port = 27017,
+  user = Sys.getenv("MONGODB_USER"),
+  pass = Sys.getenv("MONGODB_PASS"),
+  ca_path = "",
+  replicaset = Sys.getenv("MONGODB_REPLICASET")) {
+
+  if (prod) {
+    message("entered prod of launch_gridfs")
+    
+    url_string <- sprintf("mongodb+srv://%s:%s@%s/admin?authSource=admin&replicaSet=%s",
+    user,
+    pass,
+    host,
+    replicaset)
+
+    mongolite::gridfs(
+      db = db, 
+      prefix = prefix,
+      url = url_string,
+      options = mongolite::ssl_options(ca = ca_path, allow_invalid_hostname = TRUE)
+    )
+  } else {
+    url_string <- sprintf("mongodb://%s:%s", host, port)
+
+    mongolite::gridfs(
+      db = db, 
+      prefix = prefix,
+      url = url_string
+    )
+  }
+}
+
 
 #' launch mongodb in shiny app
 #'
