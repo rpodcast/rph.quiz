@@ -7,6 +7,7 @@ default:
   mongodb_answers_collection: answers
   mongodb_users_collection: users
   quiz_index: 1
+  firebase_config_path: "firebase.rds"
 production:
   app_prod: yes
   mongodb_host: !expr Sys.getenv("MONGODB_HOST")
@@ -17,6 +18,7 @@ production:
   mongodb_collection: answers
   mongodb_ca: /deploy_files/ca-certificate.crt
   mongodb_repset: !expr Sys.getenv("MONGODB_REPLICASET", "")
+  firebase_config_path: "/deploy_files/firebase.rds"
 dev:
   golem_wd: !expr here::here()
   mongodb_host: 127.0.0.1

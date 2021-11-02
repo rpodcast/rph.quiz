@@ -20,6 +20,7 @@ app_server <- function( input, output, session, random_question_order = TRUE ) {
   mongo_password <- get_golem_config("mongodb_pass")
   mongo_ca <- get_golem_config("mongodb_ca")
   mongo_repset <- get_golem_config("mongodb_repset")
+  firebase_config_path <- get_golem_config("firebase_config_path")
 
   if ( golem::get_golem_options("with_mongo") ){
     message("I am going to connect to mongo")
@@ -71,8 +72,8 @@ app_server <- function( input, output, session, random_question_order = TRUE ) {
     # Disable shiny server timeout
   prevent_counter <- mod_prevent_timeout_server("prevent_timeout_ui_1")
 
-  fire_obj_social <- FirebaseOauthProviders$new()
-  fire_obj_email <- FirebaseEmailPassword$new()
+  fire_obj_social <- FirebaseOauthProviders$new(config_path = firebase_config_path)
+  fire_obj_email <- FirebaseEmailPassword$new(config_path = firebase_config_path)
 
   observeEvent(prevent_counter, {
     if (!is.null(prevent_counter())) {
