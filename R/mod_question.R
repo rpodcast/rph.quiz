@@ -7,35 +7,55 @@
 #' @noRd 
 #'
 #' @importFrom shiny NS tagList 
-mod_question_ui <- function(id, question_index = 1){
+mod_question_ui <- function(
+  id, 
+  question_index = 1, 
+  type = "choice",
+  question_text = "Hello there?",
+  choices_value = c("a", "b"),
+  choices_text = c("A", "B"),
+  random_order = TRUE) {
+  
   ns <- NS(id)
+
+  if (type == "choice") {
+    if (random_order) {
+      ind <- sample(1:length(choices_value), length(choices_value), replace = FALSE)
+      choices_text <- choices_text[ind]
+      choices_value <- choices_value[ind]
+    }
+
+    ui_item <- radioButtons(
+          inputId = ns("qinput"),
+          label = question_text,
+          choiceNames = choices_text,
+          choiceValues = choices_value,
+          selected = character(0),
+          width = "100%"
+        )
+  } else if (type == "text") {
+    ui_item <- textInput(
+          inputId = ns("qinput"),
+          label = question_text,
+          value = character(0),
+          width = "100%"
+        )
+  } else if (type == "number") {
+    ui_item <- numericInput(
+          inputId = ns("qinput"),
+          label = question_text,
+          value = 0,
+          width = "100%"
+        )
+  } else {
+    stop("Unknown question type", call. = FALSE)
+  }
+
   tagList(
     fluidRow(
       col_12(
-        radioButtons(
-          inputId = ns("qinput"),
-          label = glue::glue("Question {question_index}"),
-          choices = c("a", "b", "c", "d"),
-          selected = character(0)
-        )
-        # fluidRow(
-        #   shinyWidgets::actionBttn(
-        #     inputId = ns("qsubmit"),
-        #     label = "Submit",
-        #     icon = icon("check"),
-        #     color = "success",
-        #     size = "sm",
-        #     style = "jelly"
-        #   ),
-        #   shinyWidgets::actionBttn(
-        #     inputId = ns("qreset"),
-        #     label = "Reset",
-        #     icon = icon("eraser"),
-        #     color = "danger",
-        #     size = "sm",
-        #     style = "jelly"
-        #   )
-        # )
+        h2(glue::glue("Question {question_index}")),
+        ui_item
       )
     )
   )
@@ -44,7 +64,7 @@ mod_question_ui <- function(id, question_index = 1){
 #' question Server Functions
 #'
 #' @noRd 
-mod_question_server <- function(id, question_index = 1){
+mod_question_server <- function(id, question_index = 1, quiz = 1){
   moduleServer( id, function(input, output, session){
     ns <- session$ns
 
@@ -52,32 +72,14 @@ mod_question_server <- function(id, question_index = 1){
       if (is.null(input$qinput)) {
         return(NULL)
       } else {
-        res <- tibble::tibble(
+        res <- list(
           question_index = question_index,
+          quiz = quiz,
           answer = input$qinput
         )
         return(res)
       }
     })
-
-    # observe({
-    #   shinyjs::toggleState(id = "qsubmit", condition = shiny::isTruthy(input$qinput))
-    # })
-
-    # observeEvent(input$qsubmit, {
-    #   message("qsubmit clicked")
-    #   #shinyjs::delay(100, shinyjs::toggle("qinput"))
-    #   shinyjs::disable(selector = "[type=radio][value=b]")
-    #   shinyjs::disable(selector = "[type=radio][value=c]")
-    #   shinyjs::disable(selector = "[type=radio][value=d]")
-    # })
-
-    # observeEvent(input$qreset, {
-    #   message("qreset clicked")
-    #   shinyjs::enable(selector = "[type=radio][value=b]")
-    #   shinyjs::enable(selector = "[type=radio][value=c]")
-    #   shinyjs::enable(selector = "[type=radio][value=d]")
-    # })
 
     res
 

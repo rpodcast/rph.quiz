@@ -49,8 +49,7 @@ app_ui <- function(request) {
         conditionalPanel(
           condition = "output.no_account",
           fluidRow(
-            col_12(
-              p("If you would like to see how you stack up to others in your R knowledge, you can opt-in to authenticating with your existing Google or GitHub accounts (or set up a custom email login) to be included in the leaderboard!"),
+            col_4(
               actionButton("account_management", "Account Management")
             )
           )

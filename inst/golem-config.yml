@@ -2,6 +2,11 @@ default:
   golem_name: rph.quiz
   golem_version: 0.0.0.9000
   app_prod: no
+  mongodb_db: rphqdev
+  mongodb_questions_collection: questions
+  mongodb_answers_collection: answers
+  mongodb_users_collection: users
+  quiz_index: 1
 production:
   app_prod: yes
   mongodb_host: !expr Sys.getenv("MONGODB_HOST")

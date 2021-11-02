@@ -4,7 +4,7 @@
 #'     DO NOT REMOVE.
 #' @import shiny
 #' @noRd
-app_server <- function( input, output, session ) {
+app_server <- function( input, output, session, random_question_order = TRUE ) {
 
   whereami::cat_where(whereami::whereami())
 
@@ -14,6 +14,8 @@ app_server <- function( input, output, session ) {
   mongo_host <- get_golem_config("mongodb_host")
   mongo_db <- get_golem_config("mongodb_db")
   mongo_collection <- get_golem_config("mongodb_collection")
+  mongo_questions_collection <- get_golem_config("mongodb_questions_collection")
+  mongo_users_collection <- get_golem_config("mongodb_users_collection")
   mongo_user <- get_golem_config("mongodb_user")
   mongo_password <- get_golem_config("mongodb_pass")
   mongo_ca <- get_golem_config("mongodb_ca")
@@ -32,30 +34,45 @@ app_server <- function( input, output, session ) {
       pass = mongo_password,
       ca_path = mongo_ca,
       replicaset = mongo_repset
-    )    
+    )
+
+    launch_mongo_users_shiny(
+      session = session,
+      prod = prod_mode,
+      collection = mongo_users_collection, 
+      db = mongo_db, 
+      host = mongo_host, 
+      port = mongo_port, 
+      user = mongo_user, 
+      pass = mongo_password,
+      ca_path = mongo_ca,
+      replicaset = mongo_repset
+    )
+    
+    quiz_df <- get_quiz_data(
+      quiz = 1,
+      session = session,
+      prod = prod_mode,
+      collection = mongo_questions_collection, 
+      db = mongo_db, 
+      host = mongo_host, 
+      port = mongo_port, 
+      user = mongo_user, 
+      pass = mongo_password,
+      ca_path = mongo_ca,
+      replicaset = mongo_repset
+    )
   }
 
   # Your application server logic 
   
+  # import questions collection
+
     # Disable shiny server timeout
   prevent_counter <- mod_prevent_timeout_server("prevent_timeout_ui_1")
 
   fire_obj_social <- FirebaseOauthProviders$new()
   fire_obj_email <- FirebaseEmailPassword$new()
-
-  # fire_obj <- FirebaseUI$
-  #   new("session")$
-  #   set_providers(
-  #     email = TRUE,
-  #     google = TRUE,
-  #     github = TRUE
-  #   )$
-  #   set_tos_url("https://www.privacypolicies.com/live/8c9023f9-2951-45a6-9a54-dcb2c90501bc")$
-  #   set_privacy_policy_url("https://www.privacypolicies.com/live/16ca37a3-6ea5-43b5-b469-3987fd749d8a")
-  # f_social <- FirebaseOauthProviders$new()
-  # f_email <- FirebaseEmailPassword$new()
-
-  #mod_authentication_server("authentication_ui_1", f_social, f_email)
 
   observeEvent(prevent_counter, {
     if (!is.null(prevent_counter())) {
@@ -64,8 +81,12 @@ app_server <- function( input, output, session ) {
     }
   })
 
-  n_questions <- 2
+  n_questions <- nrow(quiz_df)
   question_vec <- 1:n_questions
+
+  if (random_question_order) {
+    quiz_df <- dplyr::slice_sample(quiz_df, n = n_questions, replace = FALSE)
+  }
   
   # set up reactive values
   start_app <- reactiveVal(runif(1))
@@ -81,16 +102,37 @@ app_server <- function( input, output, session ) {
     )
   })
 
+  observeEvent(input$account_login, {
+    shiny::showModal(
+      shiny::modalDialog(
+        title = "Account Management",
+        mod_login_ui("login_ui_1"),
+        size = "xl"
+      )
+    )
+  })
+
   auth_res <- mod_authentication_server("authentication_ui_1", fire_obj_social, fire_obj_email)
 
   observeEvent(start_app(), {
-    purrr::walk(1:2, ~insertTab(
+    purrr::walk(question_vec, ~{
+      quiz_sub <- dplyr::slice(quiz_df, .x)
+      
+      insertTab(
       inputId = "tabs",
       tabPanel(
         glue::glue("Tab {.x}"),
-        mod_question_ui(glue::glue("question_ui_{.x}"), question_index = .x),
+        mod_question_ui(
+          glue::glue("question_ui_{.x}"), 
+          question_index = .x, 
+          type = quiz_sub$type, 
+          question_text = quiz_sub$question_text, 
+          choices_value = purrr::as_vector(quiz_sub$choices_value), 
+          choices_text = purrr::as_vector(quiz_sub$choices_text) 
+        ),
         value = glue::glue("qtab{.x}")
-      )))
+      ))
+    })
     
     insertTab(
       inputId = "tabs",
@@ -115,14 +157,16 @@ app_server <- function( input, output, session ) {
     res1 <- fire_obj_social$is_signed_in()
     res2 <- fire_obj_email$is_signed_in()
     if (any(res1, res2)) {
+      session$userData$fire_trigger <- 1
+      firebase_id <- session$userData$firebase_id
       shiny::removeModal()
-      p("Welcome!")
+      p("Welcome back!")
     }
   })
 
   # execute server-side question module
   whereami::cat_where(whereami::whereami())
-  answers_res <- purrr::map(1:2, ~mod_question_server(glue::glue("question_ui_{.x}"), question_index = .x), start_time)
+  answers_res <- purrr::map(question_vec, ~mod_question_server(glue::glue("question_ui_{.x}"), question_index = .x), start_time)
   mod_complete_server("complete_ui_1", answers_res, fire_obj_social, fire_obj_email)
 
   observeEvent(input$next_button, {

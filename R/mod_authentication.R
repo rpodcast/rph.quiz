@@ -13,12 +13,11 @@ mod_authentication_ui <- function(id){
   tagList(
     fluidRow(
       col_6(
-        radioButtons(
+        selectInput(
           inputId = ns("auth_choice"),
-          label = "Choose Authentication Creation Method",
-          choices = c("Google", "GitHub", "Email"),
-          selected = "Google",
-          inline = TRUE
+          label = "Choose Authentication Method",
+          choices = c("Google", "GitHub", "New Email Account", "Returning Email Account"),
+          selected = "Google"
         )
       ),
       col_3(
@@ -56,14 +55,14 @@ mod_authentication_server <- function(id, fire_obj_social = NULL, fire_obj_email
       title = "Register",
       textInput(ns("email_create"), "Your email"),
       passwordInput(ns("password_create"), "Your password"),
-      footer = actionButton(ns("create"), "Register")
+      footer = tagList(actionButton(ns("create"), "Register"), shiny::modalButton(label = "Cancel"))
     )
 
     sign_in <- shiny::modalDialog(
       title = "Sign in",
       textInput(ns("email_signin"), "Your email"),
       passwordInput(ns("password_signin"), "Your password"),
-      actionButton(ns("signin"), "Sign in")
+      footer = tagList(actionButton(ns("signin"), "Sign in"), shiny::modalButton(label = "Cancel"))
     )
 
     observeEvent(input$create_account, {
@@ -110,36 +109,16 @@ mod_authentication_server <- function(id, fire_obj_social = NULL, fire_obj_email
         f_type("social")
         fire_obj_social$set_provider("github.com")
         fire_obj_social$launch()
-      } else if (input$auth_choice == "Email"){
+      } else if (input$auth_choice == "New Email Account"){
         f_type("email")
         shiny::showModal(register)
+      } else if (input$auth_choice == "Returning Email Account") {
+        f_type("email")
+        shiny::showModal(sign_in)
       } else {
         stop("Bad choice")
       }
     })
-
-  
-    # observeEvent(input$google, {
-    #   f_type("social")
-    #   f_social$set_provider("google.com")
-    #   f_social$launch()
-    # })
-
-    # observeEvent(input$github, {
-    #   f_type("social")
-    #   f_social$set_provider("github.com")
-    #   f_social$launch()
-    # })
-
-    # observeEvent(input$email_signin, {
-    #   f_type("email")
-    #   shiny::showModal(sign_in)
-    # })
-
-    # observeEvent(input$email_register, {
-    #   f_type("email")
-    #   shiny::showModal(register)
-    # })
 
     # create the user
     observeEvent(input$create, {
@@ -161,10 +140,12 @@ mod_authentication_server <- function(id, fire_obj_social = NULL, fire_obj_email
       print(created)
     })
 
-    # observeEvent(input$signin, {
-    #   removeModal()
-    #   f_email$sign_in(input$email_signin, input$password_signin)
-    # })
+    observeEvent(input$signin, {
+      removeModal()
+      f_email$sign_in(input$email_signin, input$password_signin)
+    })
+
+
     firebase_id <- reactive({
       req(f_type())
       message(glue::glue("f_type() is {f_type()}"))
@@ -178,6 +159,8 @@ mod_authentication_server <- function(id, fire_obj_social = NULL, fire_obj_email
         stop("f is null")
         #f <- NULL
       }
+
+      session$userData$firebase_id <- res$response$uid
       res$response$uid
     })
 

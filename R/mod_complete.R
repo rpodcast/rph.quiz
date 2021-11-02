@@ -44,55 +44,89 @@ mod_complete_server <- function(id, answers_res, fire_obj_social, fire_obj_email
   moduleServer( id, function(input, output, session){
     ns <- session$ns
 
-
-    # observeEvent(click_trigger(), {
-    #   if (shiny::isTruthy(auth_res()$firebase_id)) {
-    #     if (auth_res()$firebase_id != current_firebase_id()) {
-    #       whereami::cat_where(whereami::whereami(path_expand = TRUE))
-    #       # assemble tidy data frame of each question and answer
-    #       q_df <- purrr::map_df(answers_res, ~{ tmp <- .x()}) %>%
-    #         dplyr::mutate(user_id_form = auth_res()$user_id_form, firebase_id = auth_res()$firebase_id, timestamp = Sys.time())
-          
-    #       # send to database
-    #       qdb_res <- get_mongo()$insert(data = q_df)
-
-    #       shinyWidgets::show_alert(
-    #         title = "Yes!",
-    #         text = glue::glue("Thank you, {auth_res()$user_id_form}! Your answers have been submitted"),
-    #         type = "success"
-    #       )
-
-    #       current_firebase_id(auth_res()$firebase_id)
-    #     }
-    #   }
-    # })
-
     observeEvent(input$qsubmit, {
-      browser()
-      if (fire_obj_social$is_signed_in()) {
-        res <- fire_obj_social$get_signed_in()
-      }
+      
+      if (is.null(session$userData$fire_trigger)) {
+        res <- NULL
+      } else {
+        if (fire_obj_social$is_signed_in()) {
+          res <- fire_obj_social$get_signed_in()
+        }
 
-      if (fire_obj_email$is_signed_in()) {
-        res <- fire_obj_email$get_signed_in()
+        if (fire_obj_email$is_signed_in()) {
+          res <- fire_obj_email$get_signed_in()
+        }
       }
 
       if (shiny::isTruthy(res)) {
-        #firebase_id <- auth_res()$firebase_id
-        #user_id_form <- auth_res()$user_id_form
-        # assemble tidy data frame of each question and answer
-        q_df <- purrr::map_df(answers_res, ~{ tmp <- .x()}) %>%
-          dplyr::mutate(user_id_form = session$userData$user_id_form, firebase_id = res$response$uid, timestamp = Sys.time())
+        
+
+        # grab contents of current users collection
+        n_rows <- get_mongo_users()$count()
+
+        # if records exist, grab the unique names
+        if (n_rows > 0) {
+          # check if user ID exists
+          all_ids <- get_mongo_users()$distinct(
+            'user_id', query = '{}'
+          )
+
+          if (!session$userData$user_id_form %in% all_ids) {
+            # add to mongodb database
+            user_df <- tibble::tibble(
+              firebase_id = res$response$uid,
+              user_id = session$userData$user_id_form
+            )
+
+            user_res <- get_mongo_users()$insert(data = user_df)
+          }
+        } else {
+          # add to mongodb database
+          user_df <- tibble::tibble(
+            firebase_id = res$response$uid,
+            user_id = session$userData$user_id_form
+          )
+
+          user_res <- get_mongo_users()$insert(data = user_df)
+        }
+
+        answers_res1 <- purrr::map(answers_res, ~{ tmp <- .x()})
+
+        q_res <- purrr::map(answers_res1, function(x) {
+          tmp <- x
+          tmp[["user_id"]] <- session$userData$user_id_form
+          tmp[["firebase_id"]] <- res$response$uid
+          tmp[["timestamp"]] <- Sys.time()
+
+          return(tmp)
+        })
+
+        # q_df <- purrr::map_df(answers_res, ~{ tmp <- .x()}) %>%
+        #   dplyr::mutate(user_id_form = session$userData$user_id_form, firebase_id = res$response$uid, timestamp = Sys.time())
         
         # send to database
-        qdb_res <- get_mongo()$insert(data = q_df)
+        qdb_res <- purrr::walk(q_res, ~get_mongo()$insert(data = .x))
 
         shinyWidgets::show_alert(
           title = "Yes!",
-          text = glue::glue("Thank you, {session$userData$user_id_form}! Your answers have been submitted"),
+          text = glue::glue("Thank you! Your answers have been submitted"),
           type = "success"
         )
       } else {
+
+        answers_res1 <- purrr::map(answers_res, ~{ tmp <- .x()})
+
+        q_res <- purrr::map(answers_res1, function(x) {
+          tmp <- x
+          tmp[["user_id"]] <- "anonymous"
+          tmp[["firebase_id"]] <- "anonymous"
+          tmp[["timestamp"]] <- Sys.time()
+
+          return(tmp)
+        })
+        # send to database
+        qdb_res <- purrr::walk(q_res, ~get_mongo()$insert(data = .x))
+
         shinyWidgets::show_alert(
           title = "Yes!",
           text = glue::glue("Thank you! Your answers have been submitted"),

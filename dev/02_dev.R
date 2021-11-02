@@ -24,6 +24,7 @@ golem::add_module( name = "welcome" ) # Name of the module
 golem::add_module( name = "complete")
 golem::add_module( name = "prevent_timeout")
 golem::add_module( name = "authentication")
+golem::add_module( name = "login")
 
 ## Add helper functions ----
 ## Creates fct_* and utils_*

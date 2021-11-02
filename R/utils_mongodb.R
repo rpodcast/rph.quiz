@@ -116,10 +116,78 @@ launch_mongo_shiny <- function(
   invisible(TRUE)
 }
 
+launch_mongo_users_shiny <- function(
+  session = getDefaultReactiveDomain(),
+  prod = FALSE,
+  collection = "users",
+  db = "rphquiz",
+  host = "127.0.0.1",
+  port = 27017,
+  user = NULL,
+  pass = NULL,
+  ca_path = NULL,
+  replicaset = NULL
+){
+  message("entered launch mongo shiny")
+  
+  session$userData$mongo_users <- launch_mongo(
+    prod = prod,
+    collection = collection,
+    db = db,
+    host = host,
+    port = port,
+    user = user,
+    pass = pass,
+    ca_path = ca_path,
+    replicaset = replicaset
+  )
+
+  invisible(TRUE)
+}
+
+get_mongo_users <- function(session = getDefaultReactiveDomain()) {
+  session$userData$mongo_users
+}
+
 get_mongo <- function(session = getDefaultReactiveDomain()) {
   session$userData$mongo
 }
 
 get_mongo_stats <- function(session = getDefaultReactiveDomain()) {
   session$userData$mongo_stats
+}
+
+get_quiz_data <- function(
+  quiz = 1,
+  session = getDefaultReactiveDomain(),
+  prod = FALSE,
+  collection = "questions",
+  db = "rphquiz",
+  host = "127.0.0.1",
+  port = 27017,
+  user = NULL,
+  pass = NULL,
+  ca_path = NULL,
+  replicaset = NULL
+) {
+  m <- launch_mongo(
+    prod = prod,
+    collection = collection,
+    db = db,
+    host = host,
+    port = port,
+    user = user,
+    pass = pass,
+    ca_path = ca_path,
+    replicaset = replicaset
+  )
+
+  res <- m$find() %>%
+    dplyr::mutate(quiz = purrr::as_vector(quiz),
+         question_text = purrr::as_vector(question_text),
+         answer_text = purrr::as_vector(answer_text),
+         type = purrr::as_vector(type)) %>%
+    dplyr::filter(quiz == quiz)
+
+  return(res)
 }
