@@ -64,7 +64,7 @@ mod_question_ui <- function(
 #' question Server Functions
 #'
 #' @noRd 
-mod_question_server <- function(id, question_index = 1, quiz = 1){
+mod_question_server <- function(id, question_index = 1, quiz = 1, qid = 1){
   moduleServer( id, function(input, output, session){
     ns <- session$ns
 
@@ -75,6 +75,7 @@ mod_question_server <- function(id, question_index = 1, quiz = 1){
         res <- list(
           question_index = question_index,
           quiz = quiz,
+          qid = qid,
           answer = input$qinput
         )
         return(res)

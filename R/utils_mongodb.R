@@ -184,6 +184,7 @@ get_quiz_data <- function(
 
   res <- m$find() %>%
     dplyr::mutate(quiz = purrr::as_vector(quiz),
+         qid = purrr::as_vector(qid),
          question_text = purrr::as_vector(question_text),
          answer_text = purrr::as_vector(answer_text),
          type = purrr::as_vector(type)) %>%

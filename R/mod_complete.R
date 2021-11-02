@@ -13,19 +13,6 @@ mod_complete_ui <- function(id){
     fluidRow(
       col_12(
         h2("All done!"),
-        # p("If you would like to see how you stack up against other players, you can opt-in to creating a free authentication to the application and have your score included in the leaderboard! If you don't want to be included and just want to see how you did, that's totally fine too."),
-        # checkboxInput(
-        #   inputId = ns("opt_in_account"),
-        #   label = "Opt-in to create a free leaderboard account",
-        #   width = "100%",
-        #   value = FALSE
-        # ),
-        # conditionalPanel(
-        #   condition = "input.opt_in_account",
-        #   ns = ns,
-        #   #p("H")
-        #   mod_authentication_ui(ns("authentication_ui_1"))
-        # ),
         actionButton(
           inputId = ns("qsubmit"),
           label = "Submit",
@@ -91,7 +78,7 @@ mod_complete_server <- function(id, answers_res, fire_obj_social, fire_obj_email
         }
 
         answers_res1 <- purrr::map(answers_res, ~{ tmp <- .x()})
-
+        
         q_res <- purrr::map(answers_res1, function(x) {
           tmp <- x
           tmp[["user_id"]] <- session$userData$user_id_form
@@ -100,9 +87,6 @@ mod_complete_server <- function(id, answers_res, fire_obj_social, fire_obj_email
 
           return(tmp)
         })
-
-        # q_df <- purrr::map_df(answers_res, ~{ tmp <- .x()}) %>%
-        #   dplyr::mutate(user_id_form = session$userData$user_id_form, firebase_id = res$response$uid, timestamp = Sys.time())
         
         # send to database
         qdb_res <- purrr::walk(q_res, ~get_mongo()$insert(data = .x))

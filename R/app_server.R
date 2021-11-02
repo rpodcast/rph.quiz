@@ -166,7 +166,15 @@ app_server <- function( input, output, session, random_question_order = TRUE ) {
 
   # execute server-side question module
   whereami::cat_where(whereami::whereami())
-  answers_res <- purrr::map(question_vec, ~mod_question_server(glue::glue("question_ui_{.x}"), question_index = .x), start_time)
+  answers_res <- purrr::map(question_vec, ~{
+    quiz_sub <- dplyr::slice(quiz_df, .x)
+    mod_question_server(
+      glue::glue("question_ui_{.x}"), 
+      question_index = .x, 
+      quiz = quiz_sub$quiz, 
+      qid = quiz_sub$qid)
+  })
+
   mod_complete_server("complete_ui_1", answers_res, fire_obj_social, fire_obj_email)
 
   observeEvent(input$next_button, {
